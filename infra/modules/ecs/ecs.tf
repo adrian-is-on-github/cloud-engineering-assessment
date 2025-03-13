@@ -15,6 +15,13 @@ resource "aws_ecs_cluster" "app_cluster" {
 
 
 
+resource "aws_cloudwatch_log_group" "log_group" {
+  name = "${var.task_definition_family}-log-group"
+  tags = var.tags
+}
+
+
+
 resource "aws_ecs_task_definition" "task_definition" {
   family                   = var.task_definition_family
   network_mode             = "awsvpc"
