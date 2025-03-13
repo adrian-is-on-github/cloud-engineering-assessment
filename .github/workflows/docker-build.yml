@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'app/**' # Only trigger if files in app change
+  workflow_dispatch: # Allow manual triggering
 
 jobs:
   build-push-deploy:
@@ -31,7 +32,7 @@ jobs:
           ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}
           IMAGE_TAG=${{ github.sha }}
 
-          docker build --no-cache -f app/Dockerfile -t $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:latest -t $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:$IMAGE_TAG app/
+          docker build --no-cache -f app/Dockerfile -t $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:$IMAGE_TAG -t $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}:latest app/ ### SYNC THIS WITH TERRAFORM TASK DEF
 
           docker push --all-tags $ECR_REGISTRY/${{ secrets.ECR_REPOSITORY }}
 

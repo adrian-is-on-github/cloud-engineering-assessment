@@ -1,0 +1,40 @@
+# Terraform Files
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Ignore Terraform crash logs
+crash.log
+
+# Ignore plan output files
+*.tfplan
+
+# Ignore .tfvars files (can contain sensitive data)
+*.tfvars
+*.tfvars.json
+
+# Ignore AWS credentials
+.aws/
+
+# Ignore Python files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.env
+.venv/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore editor-specific files
+.vscode/
+.idea/
+*.swp
+
+# Other Cruft
+*.log
+*.tmp
+*.bak
+*.tmp
