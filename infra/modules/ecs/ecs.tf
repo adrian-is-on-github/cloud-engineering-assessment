@@ -6,11 +6,18 @@ terraform {
     }
   }
 }
-
+data "aws_region" "current" {}
 
 ### RESOURCES ###
 resource "aws_ecs_cluster" "app_cluster" {
   name = var.cluster_name
+}
+
+
+
+resource "aws_cloudwatch_log_group" "log_group" {
+  name = "${var.task_definition_family}-log-group"
+  tags = var.tags
 }
 
 
@@ -35,6 +42,14 @@ resource "aws_ecs_task_definition" "task_definition" {
           protocol      = "tcp"
         }
       ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = "${var.task_definition_family}-log-group",
+          "awslogs-region"        = data.aws_region.current.name,
+          "awslogs-stream-prefix" = "ecs"
+        }
+        }
     }
   ])
 }
