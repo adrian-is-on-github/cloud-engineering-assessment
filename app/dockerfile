@@ -10,9 +10,6 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # Copy application code
 COPY app.py .
 
-# Remove build dependencies
-RUN apk del .build-deps
-
 
 
 ### Stage 2: Final (Distroless)
