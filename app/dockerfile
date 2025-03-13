@@ -34,4 +34,6 @@ EXPOSE 5000
 
 # Run the application
 # CMD ["gunicorn", "app:app"] /usr/bin/python3.11: can't open file '/app/gunicorn': [Errno 2] No such file or directory
-CMD ["python", "-m", "gunicorn", "app:app"]
+# CMD ["python", "-m", "gunicorn", "app:app"] /usr/bin/python3.11: can't open file '/app/gunicorn': [Errno 2] No such file or directory
+CMD ["-m", "gunicorn", "app:app"]
+
