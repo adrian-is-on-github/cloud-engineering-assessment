@@ -30,12 +30,9 @@ variable "vpc_cidr" {
   description = "The CIDR block for the VPC"
   type        = string
 }
-variable "wireguard_ports" {
+variable "open_public_ports" {
   description = "List of wireguard ports"
   type        = list(number)
-}
-variable "vpn_ips" {
-  description = "List of VPN IPs"
 }
 variable "tags" {
   description = "Standard tags for resources"
@@ -202,22 +199,14 @@ resource "aws_network_acl" "public-nacl" {
   vpc_id     = aws_vpc.main.id
   subnet_ids = aws_subnet.public[*].id
 
-  # Allow inbound traffic for ephemeral ports (1024-65535)
+  # Allow inbound traffic
   ingress {
     rule_no    = 100
-    protocol   = "tcp"
+    protocol   = "-1"
     action     = "allow"
     cidr_block = "0.0.0.0/0"
-    from_port  = 32768
-    to_port    = 65535
-  }
-  ingress {
-    rule_no    = 101
-    protocol   = "udp"
-    action     = "allow"
-    cidr_block = "0.0.0.0/0"
-    from_port  = 32768
-    to_port    = 65535
+    from_port  = 0
+    to_port    = 0
   }
   # Allow all outbound traffic
   egress {
@@ -231,6 +220,9 @@ resource "aws_network_acl" "public-nacl" {
   tags = merge(var.tags, {
     Name = "public-subnet-nacl"
   })
+  ########### Future Improvement #########
+  # More refined ingress and egress rules
+  ########################################
 }
 
 
@@ -243,22 +235,14 @@ resource "aws_security_group" "public" {
     Description = "public-sg-${data.aws_region.current.name}"
   })
 }
-resource "aws_vpc_security_group_ingress_rule" "wireguard" {
+resource "aws_vpc_security_group_ingress_rule" "open_public_ports" {
   security_group_id = aws_security_group.public.id
-  from_port         = var.wireguard_ports[0]
-  to_port           = var.wireguard_ports[1]
-  ip_protocol       = "udp"
+  from_port         = var.open_public_ports[0]
+  to_port           = var.open_public_ports[1]
+  ip_protocol       = "tcp"
   cidr_ipv4         = "0.0.0.0/0"
 }
-resource "aws_vpc_security_group_ingress_rule" "ssh-vpn" {
-  for_each          = var.vpn_ips
-  security_group_id = aws_security_group.public.id
-  from_port         = 22
-  to_port           = 22
-  ip_protocol       = "tcp"
-  cidr_ipv4         = each.value
-}
-resource "aws_vpc_security_group_egress_rule" "all-outbound-pub" {
+resource "aws_vpc_security_group_egress_rule" "all_outbound_pub" {
   security_group_id = aws_security_group.public.id
   ip_protocol       = -1
   cidr_ipv4         = "0.0.0.0/0"
@@ -273,14 +257,14 @@ resource "aws_security_group" "db" {
     Description = "db-sg-${data.aws_region.current.name}"
   })
 }
-resource "aws_vpc_security_group_ingress_rule" "rds-ingress" {
+resource "aws_vpc_security_group_ingress_rule" "rds_ingress" {
   security_group_id = aws_security_group.db.id
   from_port         = 1433
   to_port           = 1433
   ip_protocol       = "tcp"
   cidr_ipv4         = var.vpc_cidr
 }
-resource "aws_vpc_security_group_egress_rule" "all-outbound-db" {
+resource "aws_vpc_security_group_egress_rule" "all_outbound_db" {
   security_group_id = aws_security_group.db.id
   ip_protocol       = -1
   cidr_ipv4         = "0.0.0.0/0"
@@ -296,4 +280,20 @@ output "db_security_group_ids" {
 }
 output "db_subnet_ids" {
   value = aws_subnet.db[*].id
+}
+output "public_subnet_ids" {
+  value = aws_subnet.public[*].id
+}
+output "public_security_group_ids" {
+  value = [aws_security_group.public.id]
+}
+output "private_subnet_ids" {
+  value = aws_subnet.private[*].id
+}
+# When using load balancer and deploying app in private subnet
+# output "private_security_group_ids" {
+#   value = [aws_security_group.private.id]
+# }
+output "vpc_id" {
+  value = aws_vpc.main.id
 }
