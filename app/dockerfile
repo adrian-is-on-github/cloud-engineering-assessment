@@ -5,7 +5,7 @@ WORKDIR /app
 # Copy requirements and install them into a dedicated folder for later reuse
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt --target=/app/dependencies
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY app.py .
@@ -17,8 +17,13 @@ FROM gcr.io/distroless/python3-debian12:latest
 # (distroless images default to non-root)
 WORKDIR /app
 
-# Copy installed dependencies and application code from the builder stage
-COPY --from=builder /app/dependencies /usr/local/lib/python3.11/site-packages
+# Copy installed dependencies from the builder's default locations.
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+
+# Copy the gunicorn executable so we can run it directly.
+COPY --from=builder /usr/local/bin/gunicorn /usr/local/bin/gunicorn
+
+# Copy the application code
 COPY --from=builder /app/app.py .
 
 # Set environment variables. Workers are set to 3 for demonstration purposes
@@ -39,5 +44,8 @@ EXPOSE 5000
 # CMD ["-m", "gunicorn", "app:app"]
 
 # Use the distroless image's default ENTRYPOINT (Python) and supply our arguments.
-# This runs "python3 -m gunicorn app:app".
-ENTRYPOINT ["python3", "-m", "gunicorn", "app:app"]
+# This runs "python3 -m gunicorn app:app". But it fails to find the gunicorn module.
+# ENTRYPOINT ["python3", "-m", "gunicorn", "app:app"]
+
+# Use the gunicorn executable directly as the ENTRYPOINT.
+ENTRYPOINT ["/usr/local/bin/gunicorn", "app:app"]
