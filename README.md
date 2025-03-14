@@ -9,7 +9,7 @@
 
 
 # Architecture Diagram
-- A quick auto-generated sketch is available at `graph.png` in the root of the repo.
+- A quick auto-generated sketch is available at `graph.png` in the /infra directory.
 
 
 ### Who to contact for questions:
