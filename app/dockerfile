@@ -13,19 +13,19 @@ COPY app.py .
 
 
 ### Stage 2: Final (Distroless)
-FROM gcr.io/distroless/python3
+FROM gcr.io/distroless/python3-debian12:latest
 # (distroless images default to non-root)
 WORKDIR /app
 
 # Copy installed dependencies and application code from the builder stage
-COPY --from=builder /app/dependencies /app/dependencies
+COPY --from=builder /app/dependencies /usr/local/lib/python3.11/site-packages
 COPY --from=builder /app/app.py .
 
 # Set environment variables. Workers are set to 3 for demonstration purposes
 ENV PYTHONUNBUFFERED=1 \
     APP_VERSION=1.0.0 \
     PORT=5000 \
-    GUNICORN_CMD_ARGS="--workers=3 --bind=0.0.0.0:5000"
+    GUNICORN_CMD_ARGS="--workers=3 --bind=0.0.0.0:5000" 
     # PYTHONPATH=/app/dependencies \
     # PATH=/app/dependencies:$PATH
 
