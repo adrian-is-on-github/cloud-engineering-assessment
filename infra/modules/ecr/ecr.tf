@@ -17,7 +17,7 @@ resource "aws_ecr_repository" "ecr" {
   tags = var.tags
 }
 
-resource "aws_ecr_lifecycle_policy" "flask_app_policy" {
+resource "aws_ecr_lifecycle_policy" "ecr_policy" {
   repository = var.ecr_repo_name
   depends_on = [aws_ecr_repository.ecr]
   policy = jsonencode(
@@ -51,7 +51,7 @@ variable "ecr_repo_name" {
 variable "image_tag_mutability" {
   description = "The tag mutability setting for the ECR repository (MUTABLE or IMMUTABLE)"
   type        = string
-  default     = "MUTABLE" # IMMUTABLE is recommended by AWS Guard Duty/Sec Hub, but makes it tough to create the task definition
+  default     = "MUTABLE" # IMMUTABLE is recommended by AWS Guard Duty/Sec Hub, but makes it tough to update the task definition
 }
 variable "expiration_days" {
   description = "Number of days before an image expires"

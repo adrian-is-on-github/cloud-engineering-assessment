@@ -31,6 +31,7 @@ module "flask_app_cluster" {
   cluster_name     = "flask_app_cluster"
 
   service_name                   = "flask_app_service"
+  security_group_ids             = module.vpc.public_security_group_ids
   subnet_ids                     = module.vpc.public_subnet_ids # Using public subnets - could do private subnets and put a load balancer in front
   task_definition_family         = "flask_app_task_definition"
   task_definition_cpu            = "256"
