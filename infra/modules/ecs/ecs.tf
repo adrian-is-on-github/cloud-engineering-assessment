@@ -6,7 +6,13 @@ terraform {
     }
   }
 }
+
+
+
+### DATA ###
 data "aws_region" "current" {}
+
+
 
 ### RESOURCES ###
 resource "aws_ecs_cluster" "app_cluster" {
@@ -49,7 +55,7 @@ resource "aws_ecs_task_definition" "task_definition" {
           "awslogs-region"        = data.aws_region.current.name,
           "awslogs-stream-prefix" = "ecs"
         }
-        }
+      }
     }
   ])
 }
@@ -64,15 +70,11 @@ resource "aws_ecs_service" "service" {
   launch_type     = "FARGATE"
 
   network_configuration {
+    security_groups = var.security_group_ids
     subnets          = var.subnet_ids
     assign_public_ip = true
   }
-
-  # depends_on = [
-  #   aws_route_table_association.public_assoc
-  # ]
 }
-
 
 
 
@@ -124,6 +126,10 @@ variable "app_ecr_repo_url" {
 variable "cluster_name" {
   description = "The name of the ECS cluster"
   type        = string
+}
+variable "security_group_ids" {
+  description = "The security group IDs for the ECS service"
+  type        = list(string)
 }
 variable "service_name" {
   description = "The name of the ECS service"

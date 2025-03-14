@@ -187,7 +187,7 @@ resource "aws_route_table_association" "db" {
   route_table_id = aws_route_table.db.id
 }
 # S3 VPC ENDPOINT ROUTE TABLE ASSOCIATION
-resource "aws_vpc_endpoint_route_table_association" "s3-db" {
+resource "aws_vpc_endpoint_route_table_association" "s3-endpoint" {
   route_table_id  = aws_route_table.db.id
   vpc_endpoint_id = aws_vpc_endpoint.s3.id
 }
@@ -281,12 +281,15 @@ output "db_security_group_ids" {
 output "db_subnet_ids" {
   value = aws_subnet.db[*].id
 }
-output "public_subnet_ids" {
-  value = aws_subnet.public[*].id
-}
 output "public_security_group_ids" {
   value = [aws_security_group.public.id]
 }
+output "public_subnet_ids" {
+  value = aws_subnet.public[*].id
+}
+# output "private_security_group_ids"{ 
+#   value = [aws_security_group.private.id]
+# }
 output "private_subnet_ids" {
   value = aws_subnet.private[*].id
 }
