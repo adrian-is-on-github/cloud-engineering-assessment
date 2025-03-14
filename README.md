@@ -1,4 +1,4 @@
-# Cloud Engineering Technical Assessment - Lockwood Publishing
+# Cloud Engineering Technical Assessment
 
 
 
@@ -21,6 +21,7 @@ Get in touch with
 
 
 ## Infra ##
+```
 .
 ├── main.tf <------------- call all modules here
 ├── modules <------------- add more modules here
@@ -32,6 +33,7 @@ Get in touch with
 │       └── vpc.tf
 ├── providers.tf <-------- define more regions here
 └── variables.tf <-------- use vars.tf in new modules when they start to get complicated
+```
 
 - The infrastructure is built to be re-usable and modular. Each module can be easily repurposed, and even deployed to different regions as needed.
 - I've also included the bones of implementing an RDS instance as well.
@@ -78,10 +80,12 @@ The ECS and ECR modules were created for this project.
 
 
 # App #
+```
 .
 ├── app.py
 ├── dockerfile
 └── requirements.txt
+```
 
 # Requirements
 - Docker for local testing *optional*
