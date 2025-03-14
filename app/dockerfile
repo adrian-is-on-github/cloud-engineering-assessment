@@ -1,5 +1,5 @@
 ### Stage 1: Build
-FROM python:3.13-alpine AS builder
+FROM python:3.11-slim AS builder
 WORKDIR /app
 
 # Copy requirements and install them into a dedicated folder for later reuse
@@ -18,16 +18,16 @@ FROM gcr.io/distroless/python3
 WORKDIR /app
 
 # Copy installed dependencies and application code from the builder stage
-COPY --from=builder /app/dependencies /app/dependencies
+COPY --from=builder /app/dependencies /usr/local/lib/python3.11/site-packages
 COPY --from=builder /app/app.py .
 
 # Set environment variables. Workers are set to 3 for demonstration purposes
 ENV PYTHONUNBUFFERED=1 \
     APP_VERSION=1.0.0 \
     PORT=5000 \
-    GUNICORN_CMD_ARGS="--workers=3 --bind=0.0.0.0:5000" \
-    PYTHONPATH=/app/dependencies \
-    PATH=/app/dependencies:$PATH
+    GUNICORN_CMD_ARGS="--workers=3 --bind=0.0.0.0:5000"
+    # PYTHONPATH=/app/dependencies \
+    # PATH=/app/dependencies:$PATH
 
 # Expose the port the app runs on
 EXPOSE 5000
@@ -35,5 +35,9 @@ EXPOSE 5000
 # Run the application
 # CMD ["gunicorn", "app:app"] /usr/bin/python3.11: can't open file '/app/gunicorn': [Errno 2] No such file or directory
 # CMD ["python", "-m", "gunicorn", "app:app"] /usr/bin/python3.11: can't open file '/app/gunicorn': [Errno 2] No such file or directory
-CMD ["-m", "gunicorn", "app:app"]
+# below crashes too after not finding dependencies in the container. ...
+# CMD ["-m", "gunicorn", "app:app"]
 
+# Use the distroless image's default ENTRYPOINT (Python) and supply our arguments.
+# This runs "python3 -m gunicorn app:app".
+ENTRYPOINT ["python3", "-m", "gunicorn", "app:app"]
