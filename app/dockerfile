@@ -18,7 +18,7 @@ FROM gcr.io/distroless/python3
 WORKDIR /app
 
 # Copy installed dependencies and application code from the builder stage
-COPY --from=builder /app/dependencies /usr/local/lib/python3.11/site-packages
+COPY --from=builder /app/dependencies /app/dependencies
 COPY --from=builder /app/app.py .
 
 # Set environment variables. Workers are set to 3 for demonstration purposes
